@@ -1,0 +1,1 @@
+{"name":"html2apkexe","version":"1.0.0","description":"Convertidor HTML a APK/EXE (modos COMPLETA y MINIMA)","scripts":{"start":"node server.js"},"license":"MIT"}

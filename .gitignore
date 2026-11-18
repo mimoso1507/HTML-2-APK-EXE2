@@ -1,0 +1,6 @@
+build/
+.gradle/
+local.properties
+app/src/main/assets/template.apk
+desktop/salida/
+node_modules/

@@ -1,0 +1,42 @@
+name: Build converter APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - name: Build template APK
+        run: gradle :template:assembleRelease --no-daemon
+      - name: Embed template
+        run: cp template/build/outputs/apk/release/template-release-unsigned.apk app/src/main/assets/template.apk
+      - name: Test conversion
+        run: gradle :app:testDebugUnitTest --no-daemon
+      - name: Verify generated APK
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          APK=app/build/test-out/miprueba.apk
+          unzip -l $APK | head -30
+          $BT/aapt2 dump badging $APK | head -30
+          $BT/apksigner verify --verbose $APK
+      - name: Build converter APK
+        run: gradle :app:assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HTML2APK-convertidor
+          path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk HTML2APK-convertidor.apk
+          gh release delete latest --cleanup-tag -y || true
+          gh release create latest HTML2APK-convertidor.apk --title "Convertidor HTML a APK" --notes "APK convertidora para instalar en Android." --target ${{ github.sha }}

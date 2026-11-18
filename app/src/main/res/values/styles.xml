@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">HTML2APK</string>
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.NoActionBar" />
+</resources>
