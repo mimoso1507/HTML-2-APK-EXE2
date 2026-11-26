@@ -1,4 +1,6 @@
 plugins { id 'com.android.application' }
+// En GitHub Actions se pasa -Pvcode=<minutos desde 1970> para que cada versión nueva se instale encima de la anterior.
+def vc = Integer.parseInt((project.findProperty('vcode') ?: '1').toString())
 android {
     namespace 'com.h2a.converter'
     compileSdk 34
@@ -6,8 +8,8 @@ android {
         applicationId 'com.h2a.converter'
         minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName '1.0'
+        versionCode vc
+        versionName '1.' + vc
     }
     signingConfigs {
         debug {
